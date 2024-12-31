@@ -34,7 +34,7 @@ TunedReeserAudioProcessor::TunedReeserAudioProcessor()
     addParameter (gain = new juce::AudioParameterFloat ("gain",                                      // parameter ID
                                                         "Gain",                                      // parameter name
                                                         juce::NormalisableRange<float> (0.0f, 1.0f), // parameter range
-                                                        0.7f));                                      // default value
+                                                        0.5f));                                      // default value
 }
 
 TunedReeserAudioProcessor::~TunedReeserAudioProcessor()
@@ -147,7 +147,7 @@ void TunedReeserAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, 
     
     buffer.clear();
     
-    synth.processBlock(buffer, midiMessages, *detuneAmount, *gain, *waveform);
+    synth.processBlock(buffer, midiMessages, *detuneAmount, *waveform, *gain);
 }
 
 //==============================================================================
