@@ -38,12 +38,27 @@ std::vector<float> TunedReeser::generateSawWaveTable()
     return sawWaveTable;
 }
 
+std::vector<float> TunedReeser::generateSquareWaveTable()
+{
+    constexpr auto WAVETABLE_LENGTH = 512; // square requires higher fidelity
+    
+    std::vector<float> squareWaveTable(WAVETABLE_LENGTH);
+    
+    for (auto i = 0; i < WAVETABLE_LENGTH; ++i)
+    {
+        squareWaveTable[i] = (i >= WAVETABLE_LENGTH / 2) ? 1 : -1;
+    }
+    
+    return squareWaveTable;
+}
+
 void TunedReeser::initializeOscillators()
 {
     constexpr auto OSCILLATORS_COUNT = 128;
     
     //const auto waveTable = generateSineWaveTable();
-    const auto waveTable = generateSawWaveTable();
+    //const auto waveTable = generateSawWaveTable();
+    const auto waveTable = generateSquareWaveTable();
     
     oscillators.clear();
     for (auto i = 0; i < OSCILLATORS_COUNT; ++i)
