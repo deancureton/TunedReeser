@@ -1,0 +1,5 @@
+# JUCE files
+JuceLibraryCode/
+
+# Build files
+Builds/
