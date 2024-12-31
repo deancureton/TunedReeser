@@ -24,11 +24,26 @@ std::vector<float> TunedReeser::generateSineWaveTable()
     return sineWaveTable;
 }
 
+std::vector<float> TunedReeser::generateSawWaveTable()
+{
+    constexpr auto WAVETABLE_LENGTH = 512; // sawtooth requires higher fidelity
+    
+    std::vector<float> sawWaveTable(WAVETABLE_LENGTH);
+    
+    for (auto i = 0; i < WAVETABLE_LENGTH; ++i)
+    {
+        sawWaveTable[i] = 1 - 2 * static_cast<float>(i) / static_cast<float>(WAVETABLE_LENGTH - 1);
+    }
+    
+    return sawWaveTable;
+}
+
 void TunedReeser::initializeOscillators()
 {
     constexpr auto OSCILLATORS_COUNT = 128;
     
-    const auto waveTable = generateSineWaveTable();
+    //const auto waveTable = generateSineWaveTable();
+    const auto waveTable = generateSawWaveTable();
     
     oscillators.clear();
     for (auto i = 0; i < OSCILLATORS_COUNT; ++i)
