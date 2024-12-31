@@ -52,7 +52,8 @@ void TunedReeser::updateOscillators()
     oscillators[1].updateWavetable(waveTable);
 }
 
-void TunedReeser::updateFrequencies() {
+void TunedReeser::updateFrequencies()
+{
     const auto noteWithBend = static_cast<float>(midiNote) + pitchBend;
     const auto frequency = midiNoteNumberToFrequency(noteWithBend);
     const auto offsetFrequency = detuneAmountToFrequency(noteWithBend, detuneAmount);
@@ -65,6 +66,7 @@ void TunedReeser::prepareToPlay(double sampleRate)
     this->sampleRate = sampleRate;
     initializeOscillators();
 }
+
 void TunedReeser::processBlock(juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages, float detuneAmount, int waveform, float gain)
 {
     this->detuneAmount = detuneAmount;

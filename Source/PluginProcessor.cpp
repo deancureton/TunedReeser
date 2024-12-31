@@ -26,6 +26,9 @@ TunedReeserAudioProcessor::TunedReeserAudioProcessor()
     addParameter (gain = new juce::AudioParameterFloat ("gain", "Gain", juce::NormalisableRange<float> (0.0f, 1.0f), 0.5f));
 }
 
+TunedReeserAudioProcessor::~TunedReeserAudioProcessor()
+{}
+
 //==============================================================================
 const juce::String TunedReeserAudioProcessor::getName() const
 {
@@ -75,16 +78,25 @@ int TunedReeserAudioProcessor::getCurrentProgram()
     return 0;
 }
 
+void TunedReeserAudioProcessor::setCurrentProgram (int index)
+{}
+
 const juce::String TunedReeserAudioProcessor::getProgramName (int index)
 {
     return {};
 }
+
+void TunedReeserAudioProcessor::changeProgramName (int index, const juce::String& newName)
+{}
 
 //==============================================================================
 void TunedReeserAudioProcessor::prepareToPlay (double sampleRate, int)
 {
     synth.prepareToPlay(sampleRate);
 }
+
+void TunedReeserAudioProcessor::releaseResources()
+{}
 
 #ifndef JucePlugin_PreferredChannelConfigurations
 bool TunedReeserAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
