@@ -152,10 +152,5 @@ float TunedReeser::midiNoteNumberToFrequency(float midiNoteNumber)
 
 float TunedReeser::detuneAmountToFrequency(float midiNoteNumber, float detuneAmount)
 {
-    constexpr auto A4_FREQUENCY = 440.f;
-    constexpr auto A4_NOTE_NUMBER = 69.f;
-    constexpr auto SEMITONES_IN_AN_OCTAVE = 12.f;
-    float semitones = (midiNoteNumber - A4_NOTE_NUMBER) / SEMITONES_IN_AN_OCTAVE;
-    return A4_FREQUENCY * std::powf(2.f, semitones + detuneAmount / 100) - A4_FREQUENCY * std::powf(2.f, semitones); // frequency difference between detuning up detuneAmount and not detuning
-    // units of detuneAmount are kind of a happy accident; originally supposed to be cents but i accidentally added them in after dividing by 12 instead of before. so 1 detuneAmount is actually 100/12 or around 8.3 cents
+    return midiNoteNumberToFrequency(midiNoteNumber + detuneAmount / 100.f) - midiNoteNumberToFrequency(midiNoteNumber); // frequency difference between detuning up detuneAmount cents and not detuning at all
 }

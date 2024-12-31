@@ -21,19 +21,19 @@ TunedReeserAudioProcessor::TunedReeserAudioProcessor()
                        )
 #endif
 {
-    addParameter (detuneAmount = new juce::AudioParameterFloat ("detuneAmount", // parameterID
-                                                                "Detune Amount", // parameter name
-                                                                juce::NormalisableRange<float> (0.0f, 20.0f),
+    addParameter (detuneAmount = new juce::AudioParameterFloat ("detuneAmount",
+                                                                "Detune Amount",
+                                                                juce::NormalisableRange<float> (0.0f, 100.0f),
                                                                 0.0f));
     addParameter (waveform = new juce::AudioParameterInt ("waveform", // parameterID
                                                           "Waveform", // parameter name
                                                           0,
                                                           2,
                                                           0));
-    addParameter (gain = new juce::AudioParameterFloat ("gain",                                      // parameter ID
-                                                        "Gain",                                      // parameter name
-                                                        juce::NormalisableRange<float> (0.0f, 1.0f), // parameter range
-                                                        0.5f));                                      // default value
+    addParameter (gain = new juce::AudioParameterFloat ("gain",
+                                                        "Gain",
+                                                        juce::NormalisableRange<float> (0.0f, 1.0f),
+                                                        0.5f));
 }
 
 TunedReeserAudioProcessor::~TunedReeserAudioProcessor()
