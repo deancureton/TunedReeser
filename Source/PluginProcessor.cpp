@@ -164,15 +164,26 @@ juce::AudioProcessorEditor* TunedReeserAudioProcessor::createEditor()
 //==============================================================================
 void TunedReeserAudioProcessor::getStateInformation (juce::MemoryBlock& destData)
 {
-    // You should use this method to store your parameters in the memory block.
-    // You could do that either as raw data, or use the XML or ValueTree classes
-    // as intermediaries to make it easy to save and load complex data.
+    std::unique_ptr<juce::XmlElement> xml (new juce::XmlElement ("TunedReeser"));
+    
+    xml->setAttribute ("detuneAmount", (double) *detuneAmount);
+    xml->setAttribute ("waveform", (int) *waveform);
+    xml->setAttribute ("gain", (double) *gain);
+    
+    copyXmlToBinary (*xml, destData);
 }
 
 void TunedReeserAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
-    // You should use this method to restore your parameters from this memory block,
-    // whose contents will have been created by the getStateInformation() call.
+    std::unique_ptr<juce::XmlElement> xmlState (getXmlFromBinary (data, sizeInBytes));
+    
+    if (xmlState.get() != nullptr) {
+        if (xmlState->hasTagName ("TunedReeser")) {
+            *detuneAmount = (float) xmlState->getDoubleAttribute ("detuneAmount", 0.0);
+            *waveform = (int) xmlState->getIntAttribute("waveform", 0);
+            *gain = (float) xmlState->getDoubleAttribute ("gain", 0.5);
+        }
+    }
 }
 
 //==============================================================================
