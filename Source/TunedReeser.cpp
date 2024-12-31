@@ -131,12 +131,14 @@ void TunedReeser::handleMidiEvent(const juce::MidiMessage &midiEvent)
     {
         oscillators[0].stop();
         oscillators[1].stop();
-    } else if (midiEvent.isPitchWheel() && oscillators[0].isPlaying()) {
+    } else if (midiEvent.isPitchWheel()) {
         constexpr auto PITCHBEND_RANGE = 4; // +- 2 semitones
         constexpr auto PITCHWHEEL_DEFAULT = 8192;
         constexpr auto PITCHWHEEL_RANGE = 8192.f; // real range, 16384, over 2 to account for positive/negative
         pitchBend = PITCHBEND_RANGE * static_cast<float>(midiEvent.getPitchWheelValue() - PITCHWHEEL_DEFAULT) / PITCHWHEEL_RANGE;
-        updateFrequencies();
+        if (oscillators[0].isPlaying()) {
+            updateFrequencies();
+        }
     }
 }
 
