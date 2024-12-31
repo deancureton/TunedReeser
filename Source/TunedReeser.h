@@ -23,8 +23,8 @@ private:
     std::vector<float> generateWaveTable(int waveType);
     void handleMidiEvent(const juce::MidiMessage& midiEvent);
     
-    float midiNoteNumberToFrequency(int midiNoteNumber);
-    float detuneAmountToFrequency(int midiNoteNumber, float detuneAmount);
+    float midiNoteNumberToFrequency(float midiNoteNumber);
+    float detuneAmountToFrequency(float midiNoteNumber, float detuneAmount);
     
     void render(juce::AudioBuffer<float>& buffer, int startSample, int endSample);
     
@@ -36,6 +36,7 @@ private:
     float detuneAmount = 0.f;
     float gain = 0.7f;
     int midiNote = 69;
+    float pitchBend = 0;
     
     int previousWaveform = 0;
     float previousDetuneAmount = 0;

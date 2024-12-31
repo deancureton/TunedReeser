@@ -70,7 +70,7 @@ void TunedReeser::processBlock(juce::AudioBuffer<float>& buffer, juce::MidiBuffe
     }
     previousWaveform = waveform;
     
-    if (detuneAmount != previousDetuneAmount)
+    if (detuneAmount != previousDetuneAmount && oscillators[0].isPlaying())
     {
         updateFrequencies();
     }
@@ -113,8 +113,9 @@ void TunedReeser::render(juce::AudioBuffer<float> &buffer, int startSample, int 
 }
 
 void TunedReeser::updateFrequencies() {
-    const auto frequency = midiNoteNumberToFrequency(midiNote);
-    const auto offsetFrequency = detuneAmountToFrequency(midiNote, detuneAmount);
+    const auto noteWithBend = static_cast<float>(midiNote) + pitchBend;
+    const auto frequency = midiNoteNumberToFrequency(noteWithBend);
+    const auto offsetFrequency = detuneAmountToFrequency(noteWithBend, detuneAmount);
     oscillators[0].setFrequency(frequency + offsetFrequency);
     oscillators[1].setFrequency(frequency - offsetFrequency);
 }
@@ -130,10 +131,16 @@ void TunedReeser::handleMidiEvent(const juce::MidiMessage &midiEvent)
     {
         oscillators[0].stop();
         oscillators[1].stop();
+    } else if (midiEvent.isPitchWheel() && oscillators[0].isPlaying()) {
+        constexpr auto PITCHBEND_RANGE = 4; // +- 2 semitones
+        constexpr auto PITCHWHEEL_DEFAULT = 8192;
+        constexpr auto PITCHWHEEL_RANGE = 8192.f; // real range, 16384, over 2 to account for positive/negative
+        pitchBend = PITCHBEND_RANGE * static_cast<float>(midiEvent.getPitchWheelValue() - PITCHWHEEL_DEFAULT) / PITCHWHEEL_RANGE;
+        updateFrequencies();
     }
 }
 
-float TunedReeser::midiNoteNumberToFrequency(int midiNoteNumber)
+float TunedReeser::midiNoteNumberToFrequency(float midiNoteNumber)
 {
     constexpr auto A4_FREQUENCY = 440.f;
     constexpr auto A4_NOTE_NUMBER = 69.f;
@@ -141,11 +148,12 @@ float TunedReeser::midiNoteNumberToFrequency(int midiNoteNumber)
     return A4_FREQUENCY * std::powf(2.f, (midiNoteNumber - A4_NOTE_NUMBER) / SEMITONES_IN_AN_OCTAVE);
 }
 
-float TunedReeser::detuneAmountToFrequency(int midiNoteNumber, float detuneAmount)
+float TunedReeser::detuneAmountToFrequency(float midiNoteNumber, float detuneAmount)
 {
     constexpr auto A4_FREQUENCY = 440.f;
     constexpr auto A4_NOTE_NUMBER = 69.f;
     constexpr auto SEMITONES_IN_AN_OCTAVE = 12.f;
     float semitones = (midiNoteNumber - A4_NOTE_NUMBER) / SEMITONES_IN_AN_OCTAVE;
-    return A4_FREQUENCY * std::powf(2.f, semitones + detuneAmount / 100) - A4_FREQUENCY * std::powf(2.f, semitones); // frequency difference between detuning up detuneAmount cents and not detuning
+    return A4_FREQUENCY * std::powf(2.f, semitones + detuneAmount / 100) - A4_FREQUENCY * std::powf(2.f, semitones); // frequency difference between detuning up detuneAmount and not detuning
+    // units of detuneAmount are kind of a happy accident; originally supposed to be cents but i accidentally added them in after dividing by 12 instead of before. so 1 detuneAmount is actually 100/12 or around 8.3 cents
 }
