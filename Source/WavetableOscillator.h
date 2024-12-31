@@ -27,6 +27,7 @@ private:
     
     std::vector<float> waveTable;
     double sampleRate;
+    
     float index = 0.f;
     float indexIncrement = 0.f;
 };

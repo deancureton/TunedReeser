@@ -21,23 +21,9 @@ TunedReeserAudioProcessor::TunedReeserAudioProcessor()
                        )
 #endif
 {
-    addParameter (detuneAmount = new juce::AudioParameterFloat ("detuneAmount",
-                                                                "Detune Amount",
-                                                                juce::NormalisableRange<float> (0.0f, 100.0f),
-                                                                0.0f));
-    addParameter (waveform = new juce::AudioParameterInt ("waveform", // parameterID
-                                                          "Waveform", // parameter name
-                                                          0,
-                                                          2,
-                                                          0));
-    addParameter (gain = new juce::AudioParameterFloat ("gain",
-                                                        "Gain",
-                                                        juce::NormalisableRange<float> (0.0f, 1.0f),
-                                                        0.5f));
-}
-
-TunedReeserAudioProcessor::~TunedReeserAudioProcessor()
-{
+    addParameter (detuneAmount = new juce::AudioParameterFloat ("detuneAmount", "Detune Amount", juce::NormalisableRange<float> (0.0f, 100.0f), 0.0f));
+    addParameter (waveform = new juce::AudioParameterInt ("waveform", "Waveform", 0, 2, 0));
+    addParameter (gain = new juce::AudioParameterFloat ("gain", "Gain", juce::NormalisableRange<float> (0.0f, 1.0f), 0.5f));
 }
 
 //==============================================================================
@@ -89,29 +75,15 @@ int TunedReeserAudioProcessor::getCurrentProgram()
     return 0;
 }
 
-void TunedReeserAudioProcessor::setCurrentProgram (int index)
-{
-}
-
 const juce::String TunedReeserAudioProcessor::getProgramName (int index)
 {
     return {};
-}
-
-void TunedReeserAudioProcessor::changeProgramName (int index, const juce::String& newName)
-{
 }
 
 //==============================================================================
 void TunedReeserAudioProcessor::prepareToPlay (double sampleRate, int)
 {
     synth.prepareToPlay(sampleRate);
-}
-
-void TunedReeserAudioProcessor::releaseResources()
-{
-    // When playback stops, you can use this as an opportunity to free up any
-    // spare memory, etc.
 }
 
 #ifndef JucePlugin_PreferredChannelConfigurations

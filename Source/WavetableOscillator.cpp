@@ -12,9 +12,7 @@
 WavetableOscillator::WavetableOscillator(std::vector<float> waveTable, double sampleRate)
         : waveTable{ std::move(waveTable) },
             sampleRate{ sampleRate }
-{
-    
-}
+{}
 
 void WavetableOscillator::updateWavetable(std::vector<float> newWaveTable) {
     waveTable = std::move(newWaveTable);

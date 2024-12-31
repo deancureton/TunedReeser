@@ -18,9 +18,12 @@ public:
     
 private:
     void initializeOscillators();
+    
     void updateOscillators();
     void updateFrequencies();
+    
     std::vector<float> generateWaveTable(int waveType);
+    
     void handleMidiEvent(const juce::MidiMessage& midiEvent);
     
     float midiNoteNumberToFrequency(float midiNoteNumber);
@@ -35,9 +38,10 @@ private:
     int waveform = 0;
     float detuneAmount = 0.f;
     float gain = 0.7f;
-    int midiNote = 69;
-    float pitchBend = 0;
     
     int previousWaveform = 0;
     float previousDetuneAmount = 0;
+    
+    int midiNote = 69;
+    float pitchBend = 0;
 };

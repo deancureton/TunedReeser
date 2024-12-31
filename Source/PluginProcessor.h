@@ -19,11 +19,9 @@ class TunedReeserAudioProcessor  : public juce::AudioProcessor
 public:
     //==============================================================================
     TunedReeserAudioProcessor();
-    ~TunedReeserAudioProcessor() override;
 
     //==============================================================================
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;
-    void releaseResources() override;
 
    #ifndef JucePlugin_PreferredChannelConfigurations
     bool isBusesLayoutSupported (const BusesLayout& layouts) const override;
@@ -46,9 +44,7 @@ public:
     //==============================================================================
     int getNumPrograms() override;
     int getCurrentProgram() override;
-    void setCurrentProgram (int index) override;
     const juce::String getProgramName (int index) override;
-    void changeProgramName (int index, const juce::String& newName) override;
 
     //==============================================================================
     void getStateInformation (juce::MemoryBlock& destData) override;

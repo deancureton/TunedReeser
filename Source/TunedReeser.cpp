@@ -52,10 +52,17 @@ void TunedReeser::updateOscillators()
     oscillators[1].updateWavetable(waveTable);
 }
 
+void TunedReeser::updateFrequencies() {
+    const auto noteWithBend = static_cast<float>(midiNote) + pitchBend;
+    const auto frequency = midiNoteNumberToFrequency(noteWithBend);
+    const auto offsetFrequency = detuneAmountToFrequency(noteWithBend, detuneAmount);
+    oscillators[0].setFrequency(frequency + offsetFrequency);
+    oscillators[1].setFrequency(frequency - offsetFrequency);
+}
+
 void TunedReeser::prepareToPlay(double sampleRate)
 {
     this->sampleRate = sampleRate;
-    
     initializeOscillators();
 }
 void TunedReeser::processBlock(juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages, float detuneAmount, int waveform, float gain)
@@ -77,7 +84,7 @@ void TunedReeser::processBlock(juce::AudioBuffer<float>& buffer, juce::MidiBuffe
     previousDetuneAmount = detuneAmount;
     
     auto currentSample = 0;
-    
+
     for (const auto midiMessage : midiMessages)
     {
         const auto midiEvent = midiMessage.getMessage();
@@ -100,7 +107,7 @@ void TunedReeser::render(juce::AudioBuffer<float> &buffer, int startSample, int 
     {
         for (auto sample = startSample; sample < endSample; ++sample)
         {
-            // both oscillators are either both playing or both not playing
+            // both oscillators are either both playing or both not playing by design
             firstChannel[sample] += oscillators[0].getSample() * gain / 2;
             firstChannel[sample] += oscillators[1].getSample() * gain / 2;
         }
@@ -110,14 +117,6 @@ void TunedReeser::render(juce::AudioBuffer<float> &buffer, int startSample, int 
     {
         std::copy(firstChannel + startSample, firstChannel + endSample, buffer.getWritePointer(channel) + startSample);
     }
-}
-
-void TunedReeser::updateFrequencies() {
-    const auto noteWithBend = static_cast<float>(midiNote) + pitchBend;
-    const auto frequency = midiNoteNumberToFrequency(noteWithBend);
-    const auto offsetFrequency = detuneAmountToFrequency(noteWithBend, detuneAmount);
-    oscillators[0].setFrequency(frequency + offsetFrequency);
-    oscillators[1].setFrequency(frequency - offsetFrequency);
 }
 
 void TunedReeser::handleMidiEvent(const juce::MidiMessage &midiEvent)
@@ -131,7 +130,9 @@ void TunedReeser::handleMidiEvent(const juce::MidiMessage &midiEvent)
     {
         oscillators[0].stop();
         oscillators[1].stop();
-    } else if (midiEvent.isPitchWheel()) {
+    }
+    else if (midiEvent.isPitchWheel())
+    {
         constexpr auto PITCHBEND_RANGE = 4; // +- 2 semitones
         constexpr auto PITCHWHEEL_DEFAULT = 8192;
         constexpr auto PITCHWHEEL_RANGE = 8192.f; // real range, 16384, over 2 to account for positive/negative
