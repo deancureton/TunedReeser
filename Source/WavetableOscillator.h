@@ -17,6 +17,8 @@ public:
     void setFrequency(float frequency);
     float getSample();
     
+    void updateWavetable(std::vector<float> newWaveTable);
+    
     void stop();
     bool isPlaying();
     

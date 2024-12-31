@@ -8,57 +8,38 @@
 
 #include "TunedReeser.h"
 
-std::vector<float> TunedReeser::generateSineWaveTable()
+std::vector<float> TunedReeser::generateWaveTable(int waveform)
 {
-    constexpr auto WAVETABLE_LENGTH = 64;
+    constexpr auto WAVETABLE_LENGTH = 512;
     
-    std::vector<float> sineWaveTable(WAVETABLE_LENGTH);
+    std::vector<float> waveTable(WAVETABLE_LENGTH);
     
     const auto TWO_PI = juce::MathConstants<float>::twoPi;
     
     for (auto i = 0; i < WAVETABLE_LENGTH; ++i)
     {
-        sineWaveTable[i] = std::sinf(TWO_PI * static_cast<float>(i) / static_cast<float>(WAVETABLE_LENGTH));
+        switch(waveform) {
+            case 1:
+                waveTable[i] = 1 - 2 * static_cast<float>(i) / static_cast<float>(WAVETABLE_LENGTH - 1);
+                break;
+            case 2:
+                waveTable[i] = (i >= WAVETABLE_LENGTH / 2) ? 1 : -1;
+                break;
+            case 0:
+            default:
+                waveTable[i] = std::sinf(TWO_PI * static_cast<float>(i) / static_cast<float>(WAVETABLE_LENGTH));
+                break;
+        }
     }
     
-    return sineWaveTable;
+    return waveTable;
 }
 
-std::vector<float> TunedReeser::generateSawWaveTable()
-{
-    constexpr auto WAVETABLE_LENGTH = 512; // sawtooth requires higher fidelity
-    
-    std::vector<float> sawWaveTable(WAVETABLE_LENGTH);
-    
-    for (auto i = 0; i < WAVETABLE_LENGTH; ++i)
-    {
-        sawWaveTable[i] = 1 - 2 * static_cast<float>(i) / static_cast<float>(WAVETABLE_LENGTH - 1);
-    }
-    
-    return sawWaveTable;
-}
-
-std::vector<float> TunedReeser::generateSquareWaveTable()
-{
-    constexpr auto WAVETABLE_LENGTH = 512; // square requires higher fidelity
-    
-    std::vector<float> squareWaveTable(WAVETABLE_LENGTH);
-    
-    for (auto i = 0; i < WAVETABLE_LENGTH; ++i)
-    {
-        squareWaveTable[i] = (i >= WAVETABLE_LENGTH / 2) ? 1 : -1;
-    }
-    
-    return squareWaveTable;
-}
-
-void TunedReeser::initializeOscillators()
+void TunedReeser::initializeOscillators(int waveform)
 {
     constexpr auto OSCILLATORS_COUNT = 128;
     
-    //const auto waveTable = generateSineWaveTable();
-    //const auto waveTable = generateSawWaveTable();
-    const auto waveTable = generateSquareWaveTable();
+    const auto waveTable = generateWaveTable(waveform);
     
     oscillators.clear();
     for (auto i = 0; i < OSCILLATORS_COUNT; ++i)
@@ -67,14 +48,36 @@ void TunedReeser::initializeOscillators()
     }
 }
 
+void TunedReeser::updateOscillators(int waveform)
+{
+    const auto waveTable = generateWaveTable(waveform);
+    
+    for (auto& oscillator: oscillators)
+    {
+        oscillator.updateWavetable(waveTable);
+    }
+}
+
 void TunedReeser::prepareToPlay(double sampleRate)
 {
     this->sampleRate = sampleRate;
     
-    initializeOscillators();
+    initializeOscillators(0);
 }
-void TunedReeser::processBlock(juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
+void TunedReeser::processBlock(juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages, float detuneAmount, float gain, int waveform)
 {
+    if (waveform != previousWaveform)
+    {
+        updateOscillators(waveform);
+    }
+    previousWaveform = waveform;
+    
+    if (detuneAmount != previousDetuneAmount)
+    {
+        // update detune
+    }
+    previousDetuneAmount = detuneAmount;
+    
     auto currentSample = 0;
     
     for (const auto midiMessage : midiMessages)
@@ -82,16 +85,16 @@ void TunedReeser::processBlock(juce::AudioBuffer<float>& buffer, juce::MidiBuffe
         const auto midiEvent = midiMessage.getMessage();
         const auto midiEventSample = static_cast<int>(midiEvent.getTimeStamp());
         
-        render(buffer, currentSample, midiEventSample);
+        render(buffer, currentSample, midiEventSample, gain);
         handleMidiEvent(midiEvent);
         
         currentSample = midiEventSample;
     }
     
-    render(buffer, currentSample, buffer.getNumSamples());
+    render(buffer, currentSample, buffer.getNumSamples(), gain);
 }
 
-void TunedReeser::render(juce::AudioBuffer<float> &buffer, int startSample, int endSample)
+void TunedReeser::render(juce::AudioBuffer<float> &buffer, int startSample, int endSample, float gainMultiplier)
 {
     auto* firstChannel = buffer.getWritePointer(0);
     
@@ -101,7 +104,7 @@ void TunedReeser::render(juce::AudioBuffer<float> &buffer, int startSample, int 
         {
             for (auto sample = startSample; sample < endSample; ++sample)
             {
-                firstChannel[sample] += oscillator.getSample();
+                firstChannel[sample] += oscillator.getSample() * gainMultiplier;
             }
         }
     }

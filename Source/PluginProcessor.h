@@ -59,4 +59,7 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TunedReeserAudioProcessor)
 
     TunedReeser synth;
+    juce::AudioParameterFloat* detuneAmount;
+    juce::AudioParameterInt* waveform;
+    juce::AudioParameterFloat* gain;
 };

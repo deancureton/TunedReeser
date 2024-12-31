@@ -14,17 +14,18 @@ class TunedReeser
 {
 public:
     void prepareToPlay(double sampleRate);
-    void processBlock(juce::AudioBuffer<float>&, juce::MidiBuffer&);
+    void processBlock(juce::AudioBuffer<float>&, juce::MidiBuffer&, float detuneAmount, float gain, int waveform);
     
 private:
-    void initializeOscillators();
-    std::vector<float> generateSineWaveTable();
-    std::vector<float> generateSawWaveTable();
-    std::vector<float> generateSquareWaveTable();
+    void initializeOscillators(int waveform);
+    void updateOscillators(int waveform);
+    std::vector<float> generateWaveTable(int waveform);
     void handleMidiEvent(const juce::MidiMessage& midiEvent);
     float midiNoteNumberToFrequency(int midiNoteNumber);
-    void render(juce::AudioBuffer<float>& buffer, int startSample, int endSample);
+    void render(juce::AudioBuffer<float>& buffer, int startSample, int endSample, float gainMultiplier);
     
     double sampleRate;
     std::vector<WavetableOscillator> oscillators;
+    int previousWaveform = 0;
+    float previousDetuneAmount = 0;
 };

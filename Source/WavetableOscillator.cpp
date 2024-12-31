@@ -16,10 +16,13 @@ WavetableOscillator::WavetableOscillator(std::vector<float> waveTable, double sa
     
 }
 
+void WavetableOscillator::updateWavetable(std::vector<float> newWaveTable) {
+    waveTable = std::move(newWaveTable);
+}
+
 void WavetableOscillator::setFrequency(float frequency)
 {
     indexIncrement = frequency * static_cast<float>(waveTable.size()) / static_cast<float>(sampleRate);
-    
 }
 
 float WavetableOscillator::getSample()

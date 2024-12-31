@@ -22,6 +22,19 @@ TunedReeserAudioProcessor::TunedReeserAudioProcessor()
                        )
 #endif
 {
+    addParameter (detuneAmount = new juce::AudioParameterFloat ("detuneAmount", // parameterID
+                                                                "Detune Amount", // parameter name
+                                                                juce::NormalisableRange<float> (0.0f, 20.0f),
+                                                                0.0f));
+    addParameter (waveform = new juce::AudioParameterInt ("waveform", // parameterID
+                                                          "Waveform", // parameter name
+                                                          0,
+                                                          2,
+                                                          0));
+    addParameter (gain = new juce::AudioParameterFloat ("gain",                                      // parameter ID
+                                                        "Gain",                                      // parameter name
+                                                        juce::NormalisableRange<float> (0.0f, 1.0f), // parameter range
+                                                        0.7f));                                      // default value
 }
 
 TunedReeserAudioProcessor::~TunedReeserAudioProcessor()
@@ -134,7 +147,7 @@ void TunedReeserAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, 
     
     buffer.clear();
     
-    synth.processBlock(buffer, midiMessages);
+    synth.processBlock(buffer, midiMessages, *detuneAmount, *gain, *waveform);
 }
 
 //==============================================================================
@@ -145,7 +158,7 @@ bool TunedReeserAudioProcessor::hasEditor() const
 
 juce::AudioProcessorEditor* TunedReeserAudioProcessor::createEditor()
 {
-    return new TunedReeserAudioProcessorEditor (*this);
+    return new juce::GenericAudioProcessorEditor (*this);
 }
 
 //==============================================================================
