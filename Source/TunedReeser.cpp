@@ -126,7 +126,7 @@ void TunedReeser::handleMidiEvent(const juce::MidiMessage &midiEvent)
         midiNote = midiEvent.getNoteNumber();
         updateFrequencies();
     }
-    else if (midiEvent.isNoteOff() || midiEvent.isAllNotesOff())
+    else if ((midiEvent.isNoteOff() || midiEvent.isAllNotesOff()) && midiEvent.getNoteNumber() == midiNote)
     {
         oscillators[0].stop();
         oscillators[1].stop();
